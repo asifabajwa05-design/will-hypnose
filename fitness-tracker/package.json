@@ -1,0 +1,9 @@
+{
+  "name": "familien-fitness-tracker",
+  "version": "1.0.0",
+  "description": "Privater Fitness-Tracker für die Familie (Admin + Mitglieder)",
+  "private": true,
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
+}
