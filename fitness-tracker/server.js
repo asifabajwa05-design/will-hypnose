@@ -83,6 +83,8 @@ function addDays(date, n) {
 
 // ---------- HTTP-Grundlagen ----------
 const attempts = new Map(); // Login-Schutz
+// Hinter einem Hosting-Proxy (TRUST_PROXY=1) steht die echte Client-IP im X-Forwarded-For-Header.
+const clientIp = (req) => (process.env.TRUST_PROXY === '1' && (req.headers['fly-client-ip'] || String(req.headers['x-forwarded-for'] || '').split(',')[0].trim())) || req.socket.remoteAddress;
 function send(res, code, obj, headers = {}) {
   const body = JSON.stringify(obj);
   res.writeHead(code, Object.assign({ 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }, headers));
@@ -157,7 +159,7 @@ async function api(req, res, url) {
   }
   if (route === 'POST /api/login') {
     const username = String(body.username || '').trim().toLowerCase();
-    const key = req.socket.remoteAddress + '|' + username;
+    const key = clientIp(req) + '|' + username;
     const a = attempts.get(key) || { n: 0, until: 0 };
     if (a.until > Date.now()) return fail(res, 429, 'Zu viele Versuche. Bitte in ein paar Minuten erneut probieren.');
     const u = db.users.find((x) => x.username === username);
